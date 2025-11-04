@@ -1,6 +1,7 @@
 """Graph XBlock to help plot graph for mathematical equation in the course."""
 
 from importlib.resources import files
+import json
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -8,19 +9,21 @@ from xblock.fields import Boolean, String, Scope
 from xblock.utils.studio_editable import StudioEditableXBlockMixin
 from xblock.validation import ValidationMessage
 
+
 def line_style_choice():
-  """ Choices for the line style in graph.
-  """
-  return [
-    { "display_name": "Solid", "value": "Desmos.Styles.SOLIID"},
-    { "display_name": "Dashed", "value": "Desmos.Styles.DASHED"},
-    { "display_name": "Dotted", "value": "Desmos.Styles.DOTTED"},
-  ]
+    """Choices for the line style in graph."""
+    return [
+        {"display_name": "Solid", "value": "Desmos.Styles.SOLIID"},
+        {"display_name": "Dashed", "value": "Desmos.Styles.DASHED"},
+        {"display_name": "Dotted", "value": "Desmos.Styles.DOTTED"},
+    ]
+
 
 class GraphXBlock(StudioEditableXBlockMixin, XBlock):
     """
-    Graph XBlock is used to plot grahs for the student,
+    Graph XBlock is used to plot graphs for the students.
     """
+
     api_key = String(
         default="",
         scope=Scope.content,
@@ -37,8 +40,8 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
     line_style = String(
         display_name="Line Style",
         help="The style of lines to show on graph",
-        default="Solid",
-        values = line_style_choice,
+        default="",
+        values=line_style_choice,
         scope=Scope.content,
     )
 
@@ -64,8 +67,30 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.content,
     )
 
-    editable_fields = ("display_name", "api_key", "seed_equation", "line_style",
-                       "xaxis_label", "yaxis_label", "hide_expression")
+    save_state_allowed = Boolean(
+        display_name="Save State",
+        help="Enabling this will allow the user to save the state of the graph",
+        default=False,
+        scope=Scope.content,
+    )
+
+    state = String(
+        display_name="State for the user",
+        help="Stores state of the user",
+        default="",
+        scope=Scope.user_state,
+    )
+
+    editable_fields = (
+        "display_name",
+        "api_key",
+        "seed_equation",
+        "line_style",
+        "xaxis_label",
+        "yaxis_label",
+        "hide_expression",
+        "save_state_allowed",
+    )
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -76,36 +101,54 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
         The primary view of the GraphXBlock, shown to students
         when viewing courses.
         """
-        desmos_cdn_url = f"https://www.desmos.com/api/v1.9/calculator.js?apiKey={self.api_key}"
+        desmos_cdn_url = (
+            f"https://www.desmos.com/api/v1.9/calculator.js?apiKey={self.api_key}"
+        )
         html = self.resource_string("static/html/graphxblock.html")
         frag = Fragment(html.format(self=self, desmos_cdn_url=desmos_cdn_url))
         frag.add_css(self.resource_string("static/css/graphxblock.css"))
         frag.add_javascript(self.resource_string("static/js/src/graphxblock.js"))
-        frag.initialize_js('GraphXBlock', {
-            "default_expression": self.seed_equation,
-            "line_style": self.line_style,
-            "x_axis_lable": self.xaxis_label,
-            "y_axis_lable": self.yaxis_label,
-            "hide_expression": self.hide_expression,
-        })
+        frag.initialize_js(
+            "GraphXBlock",
+            {
+                "default_expression": self.seed_equation,
+                "line_style": self.line_style,
+                "x_axis_lable": self.xaxis_label,
+                "y_axis_lable": self.yaxis_label,
+                "hide_expression": self.hide_expression,
+                "save_state_allowed": self.save_state_allowed,
+                "state": self.state,
+            },
+        )
         return frag
 
     def validate_field_data(self, validation, data):
-      if len(data.api_key.strip()) == 0:
-        return validation.add(ValidationMessage(ValidationMessage.ERROR, "Please add an API Key"))
+        if len(data.api_key.strip()) == 0:
+            return validation.add(
+                ValidationMessage(ValidationMessage.ERROR, "Please add an API Key")
+            )
+
+    @XBlock.json_handler
+    def save_state(self, data, suffix=""):
+        self.state = json.dumps(data)
+        return {"status": "success"}
 
     @staticmethod
     def workbench_scenarios():
         """A canned scenario for display in the workbench."""
         return [
-            ("GraphXBlock",
-             """<graphxblock/>
-             """),
-            ("Multiple GraphXBlock",
-             """<vertical_demo>
+            (
+                "GraphXBlock",
+                """<graphxblock/>
+             """,
+            ),
+            (
+                "Multiple GraphXBlock",
+                """<vertical_demo>
                 <graphxblock/>
                 <graphxblock/>
                 <graphxblock/>
                 </vertical_demo>
-             """),
+             """,
+            ),
         ]
