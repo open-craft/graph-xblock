@@ -4,7 +4,6 @@ function GraphXBlock(runtime, element, data) {
   let graphBlock = $('#graphxblock_block', element).get(0);
   let graphCalculator = Desmos.GraphingCalculator(graphBlock);
   let default_expression = data?.default_expression;
-  debugger;
   let lineStyle = data?.line_style === "" ? Desmos.Styles.SOLIID : data?.line_style;
   let xAxisLabel = data?.x_axis_lable;
   let yAxisLabel = data?.y_axis_lable;
