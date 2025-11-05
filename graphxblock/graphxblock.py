@@ -8,6 +8,7 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, String, Scope
 from xblock.utils.studio_editable import StudioEditableXBlockMixin
 from xblock.validation import ValidationMessage
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def line_style_choice():
@@ -101,8 +102,11 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
         The primary view of the GraphXBlock, shown to students
         when viewing courses.
         """
+        desmos_api = configuration_helpers.get_value("DESMOS_API_KEY", None)
+        if self.api_key:
+            desmos_api = self.api_key
         desmos_cdn_url = (
-            f"https://www.desmos.com/api/v1.9/calculator.js?apiKey={self.api_key}"
+            f"https://www.desmos.com/api/v1.9/calculator.js?apiKey={desmos_api}"
         )
         html = self.resource_string("static/html/graphxblock.html")
         frag = Fragment(html.format(self=self, desmos_cdn_url=desmos_cdn_url))
@@ -123,9 +127,13 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
         return frag
 
     def validate_field_data(self, validation, data):
-        if len(data.api_key.strip()) == 0:
+        desmos_api = configuration_helpers.get_value("DESMOS_API_KEY", None)
+        if len(data.api_key.strip()) == 0 and desmos_api is None:
             return validation.add(
-                ValidationMessage(ValidationMessage.ERROR, "Please add an API Key")
+                ValidationMessage(
+                    ValidationMessage.ERROR,
+                    "Please add an API Key in the site configuration or to the XBlock",
+                )
             )
 
     @XBlock.json_handler
