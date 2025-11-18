@@ -29,17 +29,33 @@ An Open edX XBlock that embeds a **Desmos Graphing Calculator** so learners can 
 
 ## Usage
 
+The API Key can be configured in two ways:
+
+1. In the Studio when you are adding units in the course.
+2. Adding DESMOS_API_KEY in the site configuration. Like shown in the image below. This needs to be done for CMS and LMS.
+
+![ Adding DESMOS_API_KEY](./images/adding_desmos_api_key.png)
+
 Add **GraphXBlock** to a unit (Components → Advanced). Configure:
 
-- **Desmos API Key** (`api_key`, `Scope.content`)  
-  Use your own key or the Desmos demo key.
-- **Seed Equation** (`seed_equation`, `Scope.content`)  
+- **Desmos API Key**: Use your own key or the Desmos demo key.
+- **Seed Equation**: If the author wanted to add a default graph to the sheet.
   Example: `y = x^2`
+- Style configurations of the seeded equation of the graph.
+- Adding labels to the axis.
+- **Hide Expression**: In case the author wanted to show graph without showing the equations.
+- **Save State**: This can be switched on if author wants the student to save the work on the graph sheet.
 
 The block constructs the script URL like:
 ```
 https://www.desmos.com/api/v1.9/calculator.js?apiKey=<api_key>
 ```
+
+
+In case we want to self-host DESMOS script and we want to use a custom URL, it can be achieved by adding DESMOS_URL
+to site configuration.
+
+![Adding DESMOS_URL](./images/desmos_url_config.png)
 
 ---
 
