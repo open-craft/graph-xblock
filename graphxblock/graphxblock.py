@@ -25,13 +25,22 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
     Graph XBlock is used to plot graphs for the students.
     """
 
+    display_name = String(
+        display_name="Display Name",
+        default="Graph XBlock",
+        scope=Scope.settings,
+        help="Name of the XBlock in Studio",
+    )
+
     api_key = String(
+        display_name="API Key",
         default="",
         scope=Scope.content,
         help="Desmos API key to load the graph calculator",
     )
 
     seed_equation = String(
+        display_name="Seed Equation",
         default="",
         help="If there should be some graph already shown, you can add the \
             equation here",
