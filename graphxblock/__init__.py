@@ -1,1 +1,1 @@
-from .graphxblock import GraphXBlock
+from .graphxblock import GraphXBlock as GraphXBlock

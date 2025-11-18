@@ -112,11 +112,12 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
         when viewing courses.
         """
         desmos_api = configuration_helpers.get_value("DESMOS_API_KEY", None)
+        desmos_url = configuration_helpers.get_value(
+            "DESMOS_URL", "https://www.desmos.com/api/v1.9/calculator.js"
+        )
         if self.api_key:
             desmos_api = self.api_key
-        desmos_cdn_url = (
-            f"https://www.desmos.com/api/v1.9/calculator.js?apiKey={desmos_api}"
-        )
+        desmos_cdn_url = f"{desmos_url}?apiKey={desmos_api}"
         html = self.resource_string("static/html/graphxblock.html")
         frag = Fragment(html.format(self=self, desmos_cdn_url=desmos_cdn_url))
         frag.add_css(self.resource_string("static/css/graphxblock.css"))
