@@ -1,7 +1,7 @@
 /* Javascript for GraphXBlock. */
 function GraphXBlock(runtime, element, data) {
 
-  let graphBlock = $('#graphxblock_block', element).get(0);
+  let graphBlock = $(element).find('#graphxblock_block');
   let graphCalculator = Desmos.GraphingCalculator(graphBlock);
   let default_expression = data?.default_expression;
   let lineStyle = data?.line_style === "" ? Desmos.Styles.SOLIID : data?.line_style;
@@ -29,23 +29,23 @@ function GraphXBlock(runtime, element, data) {
     graphCalculator.setState(state);
   }
 
-  let stateButton = $('#stateButton', element).get(0);
+  /* Create button on the go, it checks if the save state option is enabled
+   * and only if the option is enabled we create the button and add it to the div.
+   * */
+  let parentButton = $(element).find('#parentButton');
   if (saveState) {
-    stateButton.style.visibility = 'visible';
-  } else {
-    stateButton.style.visibility = 'hidden';
-  }
-
-  stateButton.addEventListener('click', () => {
-    let currentState = graphCalculator.getState();
-    $.ajax({
-      type: 'POST',
-      url: saveStateUrl,
-      data: JSON.stringify(currentState),
-      dataType: 'json',
-      success: () => { alert('State saved!') },
+    let saveButton = $("<button id='stateButton' class='favorite styled'> Save State</button>");
+    saveButton.on('click', () => {
+      let currentState = graphCalculator.getState();
+      $.ajax({
+        type: 'POST',
+        url: saveStateUrl,
+        data: JSON.stringify(currentState),
+        dataType: 'json',
+        success: () => { alert('State saved!') },
+      })
     })
-
-  })
+    parentButton.append(saveButton)
+  }
 
 }
