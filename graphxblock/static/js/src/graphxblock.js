@@ -1,7 +1,9 @@
 /* Javascript for GraphXBlock. */
 function GraphXBlock(runtime, element, data) {
 
-  let graphBlock = $(element).find('#graphxblock_block');
+  // Don't change this to jquery find format because the render and find
+  // doesn't play with Desmos.
+  let graphBlock = $('#graphxblock_block', element).get(0);
   let graphCalculator = Desmos.GraphingCalculator(graphBlock);
   let default_expression = data?.default_expression;
   let lineStyle = data?.line_style === "" ? Desmos.Styles.SOLIID : data?.line_style;
