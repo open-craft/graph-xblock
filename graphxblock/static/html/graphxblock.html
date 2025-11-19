@@ -2,7 +2,9 @@
 <div id="graphxblock_block"></div>
 <div class="center" id="parentButton">
 </div>
-<div class="alertBox" id="statusBanner">
+<div class="alertBox" id="statusBanner" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true" tabindex="-1">
   <p id="statusMessage"></p>
-  <span class="closebtn" id="closeBannerButton">&times;</span>
+  <button type="button" class="closebtn" id="closeBannerButton" aria-label="Close status message">
+    &times;
+  </button>
 </div>
