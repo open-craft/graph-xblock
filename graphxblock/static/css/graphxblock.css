@@ -13,7 +13,7 @@
   color: white;
   text-shadow: 1px 1px 1px black;
   border-radius: 10px;
-  background-color: tomato;
+  background-color: #bf3000;
   background-image: linear-gradient(
     to top left,
     rgb(0 0 0 / 0.2),
@@ -44,7 +44,7 @@
 
 .alertBox {
   padding: 20px;
-  background-color: #04AA6D;
+  background-color: #0b5c33;
   color: white;
   display: none;
   align-items: center;
@@ -61,8 +61,21 @@
   line-height: 20px;
   cursor: pointer;
   transition: 0.3s;
+  border: 0;
+  background: none;
+  padding: 0;
 }
 
 .closebtn:hover {
   color: black;
+}
+
+.closebtn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.alertBox:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }

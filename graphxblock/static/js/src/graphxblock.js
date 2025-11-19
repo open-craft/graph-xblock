@@ -16,6 +16,8 @@ function GraphXBlock(runtime, element, data) {
   let saveState = data?.save_state_allowed;
   let state = data?.state;
   let saveStateUrl = runtime.handlerUrl(element, 'save_state');
+  const successBannerColor = '#0b5c33';
+  const errorBannerColor = '#b00020';
   if (default_expression !== "") {
     graphCalculator.setExpression({
       latex: default_expression,
@@ -34,11 +36,35 @@ function GraphXBlock(runtime, element, data) {
     graphCalculator.setState(state);
   }
 
-  // Function to close the status banner.
-  closeBannerButton.on('click', () => {
+  const showStatusMessage = (message, isError = false) => {
+    statusMessage.text(message);
+    statusBanner.attr({
+      'aria-hidden': 'false',
+      'role': isError ? 'alert' : 'status',
+      'aria-live': isError ? 'assertive' : 'polite',
+    });
+    statusBanner.css({
+      display: 'flex',
+      backgroundColor: isError ? errorBannerColor : successBannerColor,
+    });
+    statusBanner.trigger('focus');
+  };
+
+  const resetStatusMessage = () => {
     statusMessage.text('');
-    statusBanner.css('display', 'none');
-  })
+    statusBanner.attr({
+      'aria-hidden': 'true',
+      'role': 'status',
+      'aria-live': 'polite',
+    });
+    statusBanner.css({
+      display: 'none',
+      backgroundColor: successBannerColor,
+    });
+  };
+
+  // Function to close the status banner.
+  closeBannerButton.on('click', resetStatusMessage);
 
   /* Create button on the go, it checks if the save state option is enabled
    * and only if the option is enabled we create the button and add it to the div.
@@ -54,14 +80,11 @@ function GraphXBlock(runtime, element, data) {
         data: JSON.stringify(currentState),
         dataType: 'json',
         success: () => {
-          statusMessage.text('Your graph is succuessfully saved!');
-          statusBanner.css('display', 'flex');
+          showStatusMessage('Your graph is successfully saved!');
         },
         error: (xhr, textStatus, errorThrown) => {
           let message = `The request failed with status code: ${xhr.status} and message: ${textStatus}`;
-          statusMessage.text(message);
-          statusBanner.css('background-color', '#f44336');
-          statusBanner.css('display', 'flex');
+          showStatusMessage(message, true);
         }
       })
     })
