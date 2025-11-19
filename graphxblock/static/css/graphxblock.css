@@ -1,4 +1,9 @@
 /* CSS for GraphXBlock */
+#graphxblock_block {
+  width: 100%;
+  height: 500px;
+}
+
 .styled {
   border: 0;
   line-height: 2.5;
