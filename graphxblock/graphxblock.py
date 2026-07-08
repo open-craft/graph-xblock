@@ -14,7 +14,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 def line_style_choice():
     """Choices for the line style in graph."""
     return [
-        {"display_name": "Solid", "value": "Desmos.Styles.SOLIID"},
+        {"display_name": "Solid", "value": "Desmos.Styles.SOLID"},
         {"display_name": "Dashed", "value": "Desmos.Styles.DASHED"},
         {"display_name": "Dotted", "value": "Desmos.Styles.DOTTED"},
     ]
@@ -132,6 +132,7 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
                 "hide_expression": self.hide_expression,
                 "save_state_allowed": self.save_state_allowed,
                 "state": self.state,
+                "desmos_cdn_url": desmos_cdn_url,
             },
         )
         return frag
@@ -150,6 +151,31 @@ class GraphXBlock(StudioEditableXBlockMixin, XBlock):
     def save_state(self, data, suffix=""):
         self.state = json.dumps(data)
         return {"status": "success"}
+
+    def index_dictionary(self):
+        """
+        Return metadata for indexing this XBlock in content search.
+
+        Only learner-visible, searchable text is indexed: the display name and
+        the axis labels. The seed equation is indexed only when it is shown to
+        the learner (``hide_expression`` is False).
+        """
+        xblock_body = super().index_dictionary()
+        index_body = {
+            "display_name": self.display_name,
+            "xaxis_label": self.xaxis_label or "",
+            "yaxis_label": self.yaxis_label or "",
+        }
+        # Index the seed equation only when it is shown to the learner. When
+        # hide_expression is True it is effectively the hidden answer, so skip it.
+        if self.seed_equation and not self.hide_expression:
+            index_body["seed_equation"] = self.seed_equation
+        if "content" in xblock_body:
+            xblock_body["content"].update(index_body)
+        else:
+            xblock_body["content"] = index_body
+        xblock_body["content_type"] = "Graph"
+        return xblock_body
 
     @staticmethod
     def workbench_scenarios():
