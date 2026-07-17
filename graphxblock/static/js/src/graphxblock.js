@@ -46,7 +46,11 @@ function GraphXBlock(runtime, element, data) {
   const initCalculator = () => {
     let graphCalculator = Desmos.GraphingCalculator(graphBlock);
     let default_expression = data?.default_expression;
-    let lineStyle = !data?.line_style ? 'Desmos.Styles.SOLID' : data.line_style;
+    const lineStyle = {
+      'Desmos.Styles.SOLID': Desmos.Styles.SOLID,
+      'Desmos.Styles.DASHED': Desmos.Styles.DASHED,
+      'Desmos.Styles.DOTTED': Desmos.Styles.DOTTED,
+    }[data?.line_style] || Desmos.Styles.SOLID;
     let xAxisLabel = data?.x_axis_lable;
     let yAxisLabel = data?.y_axis_lable;
     let hideExpression = data?.hide_expression;
@@ -56,9 +60,7 @@ function GraphXBlock(runtime, element, data) {
     if (default_expression !== "") {
       graphCalculator.setExpression({
         latex: default_expression,
-        // Fall back to a solid line when the stored style does not resolve to
-        // a valid Desmos style (e.g. legacy "Desmos.Styles.SOLIID" values).
-        lineStyle: eval(lineStyle) || Desmos.Styles.SOLID,
+        lineStyle,
         secret: hideExpression,
       });
     }
