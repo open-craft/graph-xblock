@@ -24,7 +24,7 @@ def package_data(pkg, roots):
 
 setup(
     name='graphxblock-xblock',
-    version='0.1',
+    version='0.2.0',
     description='GraphXBlock is used to plot mathematical equation in the course.',
     license='Apache 2.0',
     packages=[
